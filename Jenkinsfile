@@ -23,7 +23,7 @@ node('docker') {
         stage('Package') {
             def package_script = """
                 cd ${project}
-                conan create ess-dmsc/testing
+                conan create ess-dmsc/testing --build=missing
             """
             sh "docker exec ${container_name} sh -c \"${package_script}\""
         }
