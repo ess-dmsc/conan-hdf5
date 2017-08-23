@@ -1,4 +1,3 @@
-import glob
 import os
 from conans import ConanFile, AutoToolsBuildEnvironment, tools
 
@@ -35,11 +34,12 @@ class Hdf5Conan(ConanFile):
                 "--disable-sharedlib-rpath"
             ]
         )
-        tools.replace_in_file(
-            "./libtool",
-            '-install_name \$rpath/\$soname',
-            '-install_name \$soname'
-        )
+        if tools.os_info.is_macos:
+            tools.replace_in_file(
+                r"./libtool",
+                r"-install_name \$rpath/\$soname",
+                r"-install_name \$soname"
+            )
 
         env_build.make()
 
@@ -52,26 +52,6 @@ class Hdf5Conan(ConanFile):
         self.copy("*", dst="bin", src="install/bin")
         self.copy("*", dst="include", src="install/include")
         self.copy("*", dst="lib", src="install/lib")
-        if tools.os_info.is_macos:
-            self._change_dylib_install_name()
 
     def package_info(self):
         self.cpp_info.libs = ["hdf5", "hdf5_cpp", "hdf5_hl"]
-
-    def _change_dylib_install_name(self):
-        """Remove absolute path from dynamic shared library install names."""
-        libs = os.path.join(self.package_folder, "lib", '*.dylib')
-        filenames = glob.glob(libs)
-
-        self.output.info("Removing absolute paths from dynamic libraries")
-        for filename in filenames:
-            cmd = (
-                "otool -D {0} "
-                "| tail -n 1 "
-                "| xargs basename "
-                "| xargs -J % -t "
-                "install_name_tool -id % {0}".format(filename)
-            )
-            os.system(cmd)
-
-        self.output.success("Removed absolute paths from dynamic libraries")
