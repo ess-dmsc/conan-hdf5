@@ -52,7 +52,8 @@ node('docker') {
         stage('Package') {
             def package_script = """
                 cd ${project}
-                conan create ${conan_user}/${conan_pkg_channel}
+                conan create ${conan_user}/${conan_pkg_channel} \
+                    --build=missing
             """
             sh "docker exec ${container_name} sh -c \"${package_script}\""
         }
