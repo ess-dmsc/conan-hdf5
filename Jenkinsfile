@@ -49,6 +49,8 @@ node('docker') {
             }
         }
 
+        // This stage can be removed when no_proxy support is added to Conan,
+        // as the dependencies will then be found in the local server.
         stage('Get Dependencies') {
             dependencies_script = """
                 export http_proxy=''
