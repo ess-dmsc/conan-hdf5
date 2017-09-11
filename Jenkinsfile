@@ -26,7 +26,7 @@ node('docker') {
             sh "docker exec ${container_name} sh -c \"${checkout_script}\""
         }
 
-        stage('Conan setup') {
+        stage('Conan Setup') {
                 withCredentials([string(
                     credentialsId: 'local-conan-server-password',
                     variable: 'CONAN_PASSWORD'
@@ -47,6 +47,19 @@ node('docker') {
                 """
                 sh "docker exec ${container_name} sh -c \"${setup_script}\""
             }
+        }
+
+        stage('Get Dependencies') {
+            dependencies_script = """
+                export http_proxy=''
+                export https_proxy=''
+                mkdir tmp
+                cd tmp
+                conan install ../${project}
+                cd ..
+                rm -rf tmp
+            """
+            sh "docker exec ${container_name} sh -c \"${dependencies_script}\""
         }
 
         stage('Package') {
