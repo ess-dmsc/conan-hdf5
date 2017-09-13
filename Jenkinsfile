@@ -59,7 +59,6 @@ node('docker') {
             sh """docker exec ${container_name} sh -c \"
                 export http_proxy=''
                 export https_proxy=''
-                cd ${project}
                 upload_conan_package.sh ${project}/conanfile.py \
                     ${conan_remote} \
                     ${conan_user} \
