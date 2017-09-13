@@ -1,5 +1,5 @@
 def project = "conan-hdf5"
-def centos = docker.image('essdmscdm/centos-build-node:0.7.0')
+def centos = docker.image('essdmscdm/centos-build-node:0.7.2')
 def container_name = "${project}-${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
 
 def conan_remote = "ess-dmsc-local"
@@ -60,7 +60,7 @@ node('docker') {
                 export http_proxy=''
                 export https_proxy=''
                 cd ${project}
-                ./upload_package.py \
+                upload_conan_package.sh ${project}/conanfile.py \
                     ${conan_remote} \
                     ${conan_user} \
                     ${conan_pkg_channel}
