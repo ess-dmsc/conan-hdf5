@@ -2,7 +2,7 @@ project = "conan-hdf5"
 
 conan_remote = "ess-dmsc-local"
 conan_user = "ess-dmsc"
-conan_pkg_channel = "testing"
+conan_pkg_channel = "stable"
 
 images = [
     'centos': [
@@ -62,6 +62,12 @@ def get_pipeline(image_key) {
                 sh """docker exec ${container_name} ${custom_sh} -c \"
                     cd ${project}
                     conan create ${conan_user}/${conan_pkg_channel} \
+                        --settings hdf5:build_type=Release \
+                        --options hdf5:shared=False \
+                        --build=missing
+                    conan create ${conan_user}/${conan_pkg_channel} \
+                        --settings hdf5:build_type=Release \
+                        --options hdf5:shared=True \
                         --build=missing
                 \""""
             }

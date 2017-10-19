@@ -9,6 +9,8 @@ class Hdf5Conan(ConanFile):
     url = "https://github.com/ess-dmsc/conan-hdf5"
     settings = "os", "compiler", "build_type", "arch"
     requires = "zlib/1.2.11@conan/stable"
+    options = {"shared": [True, False]}
+    default_options = "shared=False", "zlib:shared=False"
     generators = "virtualbuildenv"
 
     def source(self):
@@ -24,16 +26,29 @@ class Hdf5Conan(ConanFile):
         os.unlink("hdf5-1.10.1.tar.gz")
 
     def build(self):
+        configure_args = [
+            "--prefix=",
+            "--enable-cxx",
+            "--enable-hl",
+            "--disable-sharedlib-rpath"
+        ]
+
+        if self.settings.build_type == "Debug":
+            configure_args.append("--enable-build-mode=debug")
+
+        if self.options.shared:
+            configure_args.append("--enable-shared")
+            configure_args.append("--disable-static")
+        else:
+            configure_args.append("--disable-shared")
+            configure_args.append("--enable-static")
+
         env_build = AutoToolsBuildEnvironment(self)
         env_build.configure(
             configure_dir="hdf5-1.10.1",
-            args=[
-                "--prefix=",
-                "--enable-cxx",
-                "--enable-hl",
-                "--disable-sharedlib-rpath"
-            ]
+            args=configure_args
         )
+
         if tools.os_info.is_macos:
             tools.replace_in_file(
                 r"./libtool",
