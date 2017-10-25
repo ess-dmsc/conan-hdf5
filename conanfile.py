@@ -4,7 +4,7 @@ from conans import ConanFile, AutoToolsBuildEnvironment, tools
 
 class Hdf5Conan(ConanFile):
     name = "hdf5"
-    version = "1.10.1"
+    version = "1.10.1-dm1"
     license = "BSD 2-Clause"
     url = "https://github.com/ess-dmsc/conan-hdf5"
     settings = "os", "compiler", "build_type", "arch"
@@ -29,7 +29,7 @@ class Hdf5Conan(ConanFile):
         configure_args = [
             "--prefix=",
             "--enable-cxx",
-            "--enable-hl",
+            "--enable-hl"
             "--disable-sharedlib-rpath"
         ]
 
@@ -53,7 +53,7 @@ class Hdf5Conan(ConanFile):
             tools.replace_in_file(
                 r"./libtool",
                 r"-install_name \$rpath/\$soname",
-                r"-install_name \$soname"
+                r"-install_name @rpath/\$soname"
             )
 
         env_build.make()
@@ -62,6 +62,26 @@ class Hdf5Conan(ConanFile):
         cwd = os.getcwd()
         destdir = os.path.join(cwd, "install")
         env_build.make(args=["install", "DESTDIR="+destdir])
+
+        if tools.os_info.is_macos and self.options.shared:
+            self._add_rpath_to_executables(os.path.join(destdir, "bin"))
+
+    def _add_rpath_to_executables(self, path):
+        executables = [
+            "gif2h5", "h52gif", "h5clear", "h5copy", "h5debug", "h5diff",
+            "h5dump", "h5format_convert", "h5import", "h5jam", "h5ls",
+            "h5mkgrp", "h5perf_serial", "h5repack", "h5repart", "h5stat",
+            "h5unjam", "h5watch"
+        ]
+        cwd = os.getcwd()
+        os.chdir(path)
+        for e in executables:
+            cmd = "install_name_tool -add_rpath {0} {1}".format(
+                "@executable_path/../lib", e
+            )
+            os.system(cmd)
+
+        os.chdir(cwd)
 
     def package(self):
         self.copy("*", dst="bin", src="install/bin")
