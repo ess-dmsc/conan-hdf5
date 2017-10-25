@@ -1,4 +1,5 @@
 import os
+import shutil
 from conans import ConanFile, AutoToolsBuildEnvironment, tools
 
 
@@ -7,6 +8,7 @@ class Hdf5Conan(ConanFile):
     version = "1.10.1-dm1"
     license = "BSD 2-Clause"
     url = "https://github.com/ess-dmsc/conan-hdf5"
+    exports = "files/CHANGES"
     settings = "os", "compiler", "build_type", "arch"
     requires = "zlib/1.2.11@conan/stable"
     options = {"shared": [True, False]}
@@ -66,6 +68,15 @@ class Hdf5Conan(ConanFile):
         if tools.os_info.is_macos and self.options.shared:
             self._add_rpath_to_executables(os.path.join(destdir, "bin"))
 
+        os.chdir("hdf5-1.10.1")
+        os.rename("COPYING", "LICENSE.hdf5")
+        os.rename("COPYING_LBNL_HDF5", "LICENSE.hdf5_LBNL")
+        shutil.copyfile(
+            os.path.join(self.conanfile_directory, "files", "CHANGES"),
+            "CHANGES.hdf5"
+        )
+        os.chdir(cwd)
+
     def _add_rpath_to_executables(self, path):
         executables = [
             "gif2h5", "h52gif", "h5clear", "h5copy", "h5debug", "h5diff",
@@ -87,6 +98,8 @@ class Hdf5Conan(ConanFile):
         self.copy("*", dst="bin", src="install/bin")
         self.copy("*", dst="include", src="install/include")
         self.copy("*", dst="lib", src="install/lib")
+        self.copy("LICENSE.*", src="hdf5-1.10.1")
+        self.copy("CHANGES.*", src="hdf5-1.10.1")
 
     def package_info(self):
         self.cpp_info.libs = ["hdf5", "hdf5_cpp", "hdf5_hl"]
