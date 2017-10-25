@@ -31,7 +31,7 @@ class Hdf5Conan(ConanFile):
         configure_args = [
             "--prefix=",
             "--enable-cxx",
-            "--enable-hl"
+            "--enable-hl",
             "--disable-sharedlib-rpath"
         ]
 
@@ -45,13 +45,17 @@ class Hdf5Conan(ConanFile):
             configure_args.append("--disable-shared")
             configure_args.append("--enable-static")
 
+        if tools.os_info.is_linux and self.options.shared:
+            val = os.environ.get("LDFLAGS", "")
+            os.environ["LDFLAGS"] = val + " -Wl,-rpath='$$ORIGIN/../lib'"
+
         env_build = AutoToolsBuildEnvironment(self)
         env_build.configure(
             configure_dir="hdf5-1.10.1",
             args=configure_args
         )
 
-        if tools.os_info.is_macos:
+        if tools.os_info.is_macos and self.options.shared:
             tools.replace_in_file(
                 r"./libtool",
                 r"-install_name \$rpath/\$soname",
