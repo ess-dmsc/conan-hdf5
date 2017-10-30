@@ -6,11 +6,11 @@ conan_pkg_channel = "stable"
 
 images = [
     'centos': [
-        'name': 'essdmscdm/centos-build-node:0.7.6',
+        'name': 'essdmscdm/centos-build-node:0.8.0',
         'sh': 'sh'
     ],
     'centos-gcc6': [
-        'name': 'essdmscdm/centos-gcc6-build-node:0.1.3',
+        'name': 'essdmscdm/centos-gcc6-build-node:0.2.0',
         'sh': '/usr/bin/scl enable rh-python35 devtoolset-6 -- /bin/bash'
     ]
 ]
