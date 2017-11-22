@@ -5,8 +5,9 @@ from conans import ConanFile, AutoToolsBuildEnvironment, tools
 
 class Hdf5Conan(ConanFile):
     name = "hdf5"
-    version = "1.10.1-dm1"
-    license = "BSD 2-Clause"
+    version = "1.10.1-dm2"
+    description = "HDF5 C and C++ libraries"
+    license = "https://support.hdfgroup.org/ftp/HDF5/releases/COPYING"
     url = "https://github.com/ess-dmsc/conan-hdf5"
     exports = "files/CHANGES"
     settings = "os", "compiler", "build_type", "arch"
