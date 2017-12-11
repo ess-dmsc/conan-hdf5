@@ -5,4 +5,4 @@ include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup(SKIP_RPATH)
 
 add_executable(example example.cpp)
-target_link_libraries(example -lhdf5_cpp -lhdf5_hl -lhdf5 -lz -ldl)
+target_link_libraries(example ${CONAN_LIBS} -ldl)

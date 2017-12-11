@@ -2,27 +2,27 @@ project = "conan-hdf5"
 
 conan_remote = "ess-dmsc-local"
 conan_user = "ess-dmsc"
-conan_pkg_channel = "stable"
+conan_pkg_channel = "testing"
 
 images = [
     'centos': [
-        'name': 'essdmscdm/centos-build-node:0.9.0',
+        'name': 'essdmscdm/centos-build-node:0.9.1',
         'sh': 'sh'
     ],
     'centos-gcc6': [
-        'name': 'essdmscdm/centos-gcc6-build-node:0.3.0',
+        'name': 'essdmscdm/centos-gcc6-build-node:0.3.1',
         'sh': '/usr/bin/scl enable rh-python35 devtoolset-6 -- /bin/bash'
     ],
     'fedora': [
-        'name': 'essdmscdm/fedora-build-node:0.4.1',
+        'name': 'essdmscdm/fedora-build-node:0.4.2',
         'sh': 'sh'
     ],
     'ubuntu1604': [
-        'name': 'essdmscdm/ubuntu16.04-build-node:0.0.1',
+        'name': 'essdmscdm/ubuntu16.04-build-node:0.0.2',
         'sh': 'sh'
     ],
     'ubuntu1710': [
-        'name': 'essdmscdm/ubuntu17.10-build-node:0.0.2',
+        'name': 'essdmscdm/ubuntu17.10-build-node:0.0.3',
         'sh': 'sh'
     ]
 ]
