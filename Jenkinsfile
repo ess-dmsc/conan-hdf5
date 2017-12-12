@@ -110,7 +110,7 @@ def get_pipeline(image_key) {
           \""""
 
           // Build parallel libraries only on CentOS.
-          if ['centos', 'centos-gcc6'].contains(image_key) {
+          if (['centos', 'centos-gcc6'].contains(image_key)) {
             sh """docker exec ${container_name} ${custom_sh} -c \"
               cd ${project}
               conan create ${conan_user}/${conan_pkg_channel} \
