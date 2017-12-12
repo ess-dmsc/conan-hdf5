@@ -109,15 +109,18 @@ def get_pipeline(image_key) {
               --build=missing
           \""""
 
-          sh """docker exec ${container_name} ${custom_sh} -c \"
-            cd ${project}
-            conan create ${conan_user}/${conan_pkg_channel} \
-              --settings hdf5:build_type=Release \
-              --options hdf5:cxx=False \
-              --options hdf5:shared=True \
-              --options hdf5:parallel=True \
-              --build=missing
-          \""""
+          // Build parallel libraries only on CentOS.
+          if ['centos', 'centos-gcc6'].contains(image_key) {
+            sh """docker exec ${container_name} ${custom_sh} -c \"
+              cd ${project}
+              conan create ${conan_user}/${conan_pkg_channel} \
+                --settings hdf5:build_type=Release \
+                --options hdf5:cxx=False \
+                --options hdf5:shared=True \
+                --options hdf5:parallel=True \
+                --build=missing
+            \""""
+          }  // if
         }  // stage
 
         stage("${image_key}: Upload") {
