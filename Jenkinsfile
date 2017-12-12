@@ -113,6 +113,8 @@ def get_pipeline(image_key) {
           if (['centos', 'centos-gcc6'].contains(image_key)) {
             sh """docker exec ${container_name} ${custom_sh} -c \"
               cd ${project}
+              CC=/usr/lib64/mpich-3.2/bin/mpicc \
+              CXX=/usr/lib64/mpich-3.2/bin/mpic++ \
               conan create ${conan_user}/${conan_pkg_channel} \
                 --settings hdf5:build_type=Release \
                 --options hdf5:cxx=False \
