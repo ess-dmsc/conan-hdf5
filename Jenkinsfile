@@ -16,7 +16,7 @@ images = [
   ],
 */
   'fedora': [
-    'name': 'essdmscdm/fedora-build-node:0.4.2',
+    'name': 'essdmscdm/fedora-build-node:0.4.1',
     'sh': 'sh'
   ]
 /*
