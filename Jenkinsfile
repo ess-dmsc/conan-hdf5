@@ -145,14 +145,74 @@ def get_pipeline(image_key) {
   }  // return
 }  // def
 
+def get_osx_pipeline() {
+  return {
+    node('macos') {
+      cleanWs()
+      dir("${project}") {
+        stage("OSX: Checkout") {
+          checkout scm
+        }  // stage
+
+        stage("OSX: Conan setup") {
+          withCredentials([
+            string(
+              credentialsId: 'local-conan-server-password',
+              variable: 'CONAN_PASSWORD'
+            )
+          ]) {
+            sh "conan user \
+                --password '${CONAN_PASSWORD}' \
+                --remote ${conan_remote} \
+                ${conan_user} \
+                > /dev/null"
+          }  // withCredentials
+        }  // stage
+
+        stage("OSX: Package") {
+          sh "conan create ${conan_user}/${conan_pkg_channel} \
+              --settings hdf5:build_type=Debug \
+              --options hdf5:shared=False \
+              --build=missing"
+
+          sh "conan create ${conan_user}/${conan_pkg_channel} \
+              --settings hdf5:build_type=Debug \
+              --options hdf5:shared=True \
+              --build=missing"
+
+          sh "conan create ${conan_user}/${conan_pkg_channel} \
+              --settings hdf5:build_type=Release \
+              --options hdf5:shared=False \
+              --build=missing"
+
+          sh "conan create ${conan_user}/${conan_pkg_channel} \
+              --settings hdf5:build_type=Release \
+              --options hdf5:shared=True \
+              --build=missing"
+        }  // stage
+
+        stage("OSX: Upload") {
+          sh "upload_conan_package.sh conanfile.py \
+                ${conan_remote} \
+                ${conan_user} \
+                ${conan_pkg_channel}"
+        }
+      }
+    }  // node
+  }  // return
+}  // def
+
 node {
   checkout scm
 
   def builders = [:]
+/*
   for (x in images.keySet()) {
     def image_key = x
     builders[image_key] = get_pipeline(image_key)
   }
+*/
+  builders['MacOSX'] = get_osx_pipeline()
   parallel builders
 
   // Delete workspace when build is done.
