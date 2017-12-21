@@ -5,6 +5,7 @@ conan_user = "ess-dmsc"
 conan_pkg_channel = "testing"
 
 images = [
+/*
   'centos': [
     'name': 'essdmscdm/centos-build-node:0.9.4',
     'sh': 'sh'
@@ -13,10 +14,12 @@ images = [
     'name': 'essdmscdm/centos-gcc6-build-node:0.3.4',
     'sh': '/usr/bin/scl enable rh-python35 devtoolset-6 -- /bin/bash'
   ],
+*/
   'fedora': [
     'name': 'essdmscdm/fedora-build-node:0.4.2',
     'sh': 'sh'
-  ],
+  ]
+/*
   'debian': [
     'name': 'essdmscdm/debian-build-node:0.1.1',
     'sh': 'sh'
@@ -29,13 +32,14 @@ images = [
     'name': 'essdmscdm/ubuntu17.10-build-node:0.0.3',
     'sh': 'sh'
   ]
+*/
 ]
 
 base_container_name = "${project}-${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
 
 def get_pipeline(image_key) {
   return {
-    node('docker') {
+    node('docker && dmbuild03.dm.esss.dk') {
       def container_name = "${base_container_name}-${image_key}"
       try {
         def image = docker.image(images[image_key]['name'])
