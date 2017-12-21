@@ -6,11 +6,11 @@ conan_pkg_channel = "testing"
 
 images = [
   'centos': [
-    'name': 'essdmscdm/centos-build-node:0.9.2',
+    'name': 'essdmscdm/centos-build-node:0.9.4',
     'sh': 'sh'
   ],
   'centos-gcc6': [
-    'name': 'essdmscdm/centos-gcc6-build-node:0.3.2',
+    'name': 'essdmscdm/centos-gcc6-build-node:0.3.4',
     'sh': '/usr/bin/scl enable rh-python35 devtoolset-6 -- /bin/bash'
   ],
   'fedora': [
