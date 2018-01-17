@@ -2,27 +2,31 @@ project = "conan-hdf5"
 
 conan_remote = "ess-dmsc-local"
 conan_user = "ess-dmsc"
-conan_pkg_channel = "testing"
+conan_pkg_channel = "stable"
 
 images = [
-  'centos': [
-    'name': 'essdmscdm/centos-build-node:0.9.2',
+  'centos7': [
+    'name': 'essdmscdm/centos7-build-node:1.0.1',
     'sh': 'sh'
   ],
-  'centos-gcc6': [
-    'name': 'essdmscdm/centos-gcc6-build-node:0.3.2',
+  'centos7-gcc6': [
+    'name': 'essdmscdm/centos7-gcc6-build-node:1.0.0',
     'sh': '/usr/bin/scl enable rh-python35 devtoolset-6 -- /bin/bash'
   ],
-  'fedora': [
-    'name': 'essdmscdm/fedora-build-node:0.4.2',
+  'debian9': [
+  'name': 'essdmscdm/debian9-build-node:1.0.0',
+  'sh': 'sh'
+  ],
+  'fedora25': [
+    'name': 'essdmscdm/fedora25-build-node:1.0.0',
     'sh': 'sh'
   ],
   'ubuntu1604': [
-    'name': 'essdmscdm/ubuntu16.04-build-node:0.0.2',
+    'name': 'essdmscdm/ubuntu16.04-build-node:2.0.0',
     'sh': 'sh'
   ],
   'ubuntu1710': [
-    'name': 'essdmscdm/ubuntu17.10-build-node:0.0.3',
+    'name': 'essdmscdm/ubuntu17.10-build-node:1.0.0',
     'sh': 'sh'
   ]
 ]
@@ -79,48 +83,48 @@ def get_pipeline(image_key) {
         stage("${image_key}: Package") {
           sh """docker exec ${container_name} ${custom_sh} -c \"
             cd ${project}
-            conan create ${conan_user}/${conan_pkg_channel} \
+            conan create . ${conan_user}/${conan_pkg_channel} \
               --settings hdf5:build_type=Debug \
               --options hdf5:shared=False \
-              --build=missing
+              --build=outdated
           \""""
 
           sh """docker exec ${container_name} ${custom_sh} -c \"
             cd ${project}
-            conan create ${conan_user}/${conan_pkg_channel} \
+            conan create . ${conan_user}/${conan_pkg_channel} \
               --settings hdf5:build_type=Debug \
               --options hdf5:shared=True \
-              --build=missing
+              --build=outdated
           \""""
 
           sh """docker exec ${container_name} ${custom_sh} -c \"
             cd ${project}
-            conan create ${conan_user}/${conan_pkg_channel} \
+            conan create . ${conan_user}/${conan_pkg_channel} \
               --settings hdf5:build_type=Release \
               --options hdf5:shared=False \
-              --build=missing
+              --build=outdated
           \""""
 
           sh """docker exec ${container_name} ${custom_sh} -c \"
             cd ${project}
-            conan create ${conan_user}/${conan_pkg_channel} \
+            conan create . ${conan_user}/${conan_pkg_channel} \
               --settings hdf5:build_type=Release \
               --options hdf5:shared=True \
-              --build=missing
+              --build=outdated
           \""""
 
           // Build parallel libraries only on CentOS.
-          if (['centos', 'centos-gcc6'].contains(image_key)) {
+          if (['centos7', 'centos7-gcc6'].contains(image_key)) {
             sh """docker exec ${container_name} ${custom_sh} -c \"
               cd ${project}
               CC=/usr/lib64/mpich-3.2/bin/mpicc \
               CXX=/usr/lib64/mpich-3.2/bin/mpic++ \
-              conan create ${conan_user}/${conan_pkg_channel} \
+              conan create . ${conan_user}/${conan_pkg_channel} \
                 --settings hdf5:build_type=Release \
                 --options hdf5:cxx=False \
                 --options hdf5:shared=True \
                 --options hdf5:parallel=True \
-                --build=missing
+                --build=outdated
             \""""
           }  // if
         }  // stage
@@ -141,6 +145,63 @@ def get_pipeline(image_key) {
   }  // return
 }  // def
 
+def get_macos_pipeline() {
+  return {
+    node('macos') {
+      cleanWs()
+      dir("${project}") {
+        stage("macOS: Checkout") {
+          checkout scm
+        }  // stage
+
+        stage("macOS: Conan setup") {
+          withCredentials([
+            string(
+              credentialsId: 'local-conan-server-password',
+              variable: 'CONAN_PASSWORD'
+            )
+          ]) {
+            sh "conan user \
+              --password '${CONAN_PASSWORD}' \
+              --remote ${conan_remote} \
+              ${conan_user} \
+              > /dev/null"
+          }  // withCredentials
+        }  // stage
+
+        stage("macOS: Package") {
+          sh "conan create . ${conan_user}/${conan_pkg_channel} \
+            --settings hdf5:build_type=Debug \
+            --options hdf5:shared=False \
+            --build=outdated"
+
+          sh "conan create . ${conan_user}/${conan_pkg_channel} \
+            --settings hdf5:build_type=Debug \
+            --options hdf5:shared=True \
+            --build=outdated"
+
+          sh "conan create . ${conan_user}/${conan_pkg_channel} \
+            --settings hdf5:build_type=Release \
+            --options hdf5:shared=False \
+            --build=outdated"
+
+          sh "conan create . ${conan_user}/${conan_pkg_channel} \
+            --settings hdf5:build_type=Release \
+            --options hdf5:shared=True \
+            --build=outdated"
+        }  // stage
+
+        stage("macOS: Upload") {
+          sh "upload_conan_package.sh conanfile.py \
+            ${conan_remote} \
+            ${conan_user} \
+            ${conan_pkg_channel}"
+        }  // stage
+      }  // dir
+    }  // node
+  }  // return
+}  // def
+
 node {
   checkout scm
 
@@ -149,6 +210,7 @@ node {
     def image_key = x
     builders[image_key] = get_pipeline(image_key)
   }
+  builders['macOS'] = get_macos_pipeline()
   parallel builders
 
   // Delete workspace when build is done.

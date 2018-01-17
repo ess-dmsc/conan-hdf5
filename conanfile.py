@@ -106,7 +106,7 @@ class Hdf5Conan(ConanFile):
         os.rename("COPYING", "LICENSE.hdf5")
         os.rename("COPYING_LBNL_HDF5", "LICENSE.hdf5_LBNL")
         shutil.copyfile(
-            os.path.join(self.conanfile_directory, "files", "CHANGES"),
+            os.path.join(self.source_folder, "files", "CHANGES"),
             "CHANGES.hdf5"
         )
         os.chdir(cwd)
