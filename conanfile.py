@@ -9,7 +9,7 @@ class ConfigurationException(Exception):
 
 class Hdf5Conan(ConanFile):
     name = "hdf5"
-    sha256 = "048a9d149fb99aaa1680a712963f5a78e9c43b588d0e79d55e06760ec377c172"
+    sha256 = "bfec1be8c36695a99812cf02ddc97e4b708c1754fccba5414d4adccdc073866"
 
     version = "1.10.2"
     description = "HDF5 C and C++ libraries"
@@ -49,8 +49,8 @@ class Hdf5Conan(ConanFile):
             tools.download(
                 "https://www.hdfgroup.org/package/source-gzip-2/?wpdmdl=11810",
                 self.archive_name
+				tools.check_sha256(self.archive_name, self.sha256)
             )
-        tools.check_sha256(self.archive_name, self.sha256)
         tools.unzip(self.archive_name)
         os.unlink(self.archive_name)
 
