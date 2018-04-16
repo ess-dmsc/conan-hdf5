@@ -11,7 +11,7 @@ class Hdf5Conan(ConanFile):
     name = "hdf5"
     sha256 = "048a9d149fb99aaa1680a712963f5a78e9c43b588d0e79d55e06760ec377c172"
 
-    version = "1.10.1-dm3"
+    version = "1.10.2"
     description = "HDF5 C and C++ libraries"
     license = "https://support.hdfgroup.org/ftp/HDF5/releases/COPYING"
     url = "https://github.com/ess-dmsc/conan-hdf5"
@@ -31,7 +31,7 @@ class Hdf5Conan(ConanFile):
     )
     generators = "virtualbuildenv"
 
-    folder_name = "hdf5-1.10.1"
+    folder_name = "hdf5-1.10.2"
     archive_name = "%s.tar.gz" % folder_name
 
     def configure(self):
@@ -40,10 +40,16 @@ class Hdf5Conan(ConanFile):
             raise ConfigurationException(msg)
 
     def source(self):
-        tools.download(
-            "https://www.hdfgroup.org/package/gzip/?wpdmdl=4301",
-            self.archive_name
-        )
+	    if tools.os_info.is_windows:
+		    tools.download(
+				"https://www.hdfgroup.org/package/source-cmake-windows-2/?wpdmdl=11820",
+				self.archive_name
+			)
+		else:
+			tools.download(
+				"https://www.hdfgroup.org/package/source-gzip-2/?wpdmdl=11810",
+				self.archive_name
+			)
         tools.check_sha256(self.archive_name, self.sha256)
         tools.unzip(self.archive_name)
         os.unlink(self.archive_name)
@@ -79,37 +85,43 @@ class Hdf5Conan(ConanFile):
             val = os.environ.get("LDFLAGS", "")
             os.environ["LDFLAGS"] = val + " -Wl,-rpath='$$ORIGIN/../lib'"
 
-        env_build = AutoToolsBuildEnvironment(self)
-        env_build.configure(
-            configure_dir=self.folder_name,
-            args=configure_args
-        )
+		if tools.os_info.is_windows:
+		    cmake_directory = "CMake-" + self.folder_name
+			os.chdir(cmake_directory)
+			static_option = "No" if self.options.shared else "Yes"
+			self.run("ctest -S HDF5config.cmake,BUILD_GENERATOR=VS201564,STATIC_ONLY=%s -C %s -V -O hdf5.log" % (static_option, self.settings.build_type))
+		else:
+			env_build = AutoToolsBuildEnvironment(self)
+			env_build.configure(
+				configure_dir=self.folder_name,
+				args=configure_args
+			)
 
-        if tools.os_info.is_macos and self.options.shared:
-            tools.replace_in_file(
-                r"./libtool",
-                r"-install_name \$rpath/\$soname",
-                r"-install_name @rpath/\$soname"
-            )
+			if tools.os_info.is_macos and self.options.shared:
+				tools.replace_in_file(
+					r"./libtool",
+					r"-install_name \$rpath/\$soname",
+					r"-install_name @rpath/\$soname"
+				)
 
-        env_build.make()
+			env_build.make()
 
-        os.mkdir("install")
-        cwd = os.getcwd()
-        destdir = os.path.join(cwd, "install")
-        env_build.make(args=["install", "DESTDIR="+destdir])
+			os.mkdir("install")
+			cwd = os.getcwd()
+			destdir = os.path.join(cwd, "install")
+			env_build.make(args=["install", "DESTDIR="+destdir])
 
-        if tools.os_info.is_macos and self.options.shared:
-            self._add_rpath_to_executables(os.path.join(destdir, "bin"))
+			if tools.os_info.is_macos and self.options.shared:
+				self._add_rpath_to_executables(os.path.join(destdir, "bin"))
 
-        os.chdir("hdf5-1.10.1")
-        os.rename("COPYING", "LICENSE.hdf5")
-        os.rename("COPYING_LBNL_HDF5", "LICENSE.hdf5_LBNL")
-        shutil.copyfile(
-            os.path.join(self.source_folder, "files", "CHANGES"),
-            "CHANGES.hdf5"
-        )
-        os.chdir(cwd)
+		os.chdir(self.folder_name)
+		os.rename("COPYING", "LICENSE.hdf5")
+		os.rename("COPYING_LBNL_HDF5", "LICENSE.hdf5_LBNL")
+		shutil.copyfile(
+			os.path.join(self.source_folder, "files", "CHANGES"),
+			"CHANGES.hdf5"
+		)
+		os.chdir(cwd)
 
     def _add_rpath_to_executables(self, path):
         executables = [
