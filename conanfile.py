@@ -49,8 +49,8 @@ class Hdf5Conan(ConanFile):
             tools.download(
                 "https://www.hdfgroup.org/package/source-gzip-2/?wpdmdl=11810",
                 self.archive_name
-				tools.check_sha256(self.archive_name, self.sha256)
             )
+            tools.check_sha256(self.archive_name, self.sha256)
         tools.unzip(self.archive_name)
         os.unlink(self.archive_name)
 
