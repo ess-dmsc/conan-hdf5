@@ -15,7 +15,7 @@ class Hdf5Conan(ConanFile):
     description = "HDF5 C and C++ libraries"
     license = "https://support.hdfgroup.org/ftp/HDF5/releases/COPYING"
     url = "https://github.com/ess-dmsc/conan-hdf5"
-    exports = "files/CHANGES"
+    exports = ["files/CHANGES", "files/HDF5options.cmake"]
     settings = "os", "compiler", "build_type", "arch"
     requires = "zlib/1.2.11@conan/stable"
     options = {
@@ -91,6 +91,7 @@ class Hdf5Conan(ConanFile):
 
         os.mkdir("install")
         if tools.os_info.is_windows:
+            cwd = os.getcwd()
             os.chdir(self.windows_source_folder)
             
             # Override build settings using our own options file
@@ -128,7 +129,6 @@ class Hdf5Conan(ConanFile):
             if tools.os_info.is_macos and self.options.shared:
                 self._add_rpath_to_executables(os.path.join(destdir, "bin"))
 
-        cwd = os.getcwd()
         os.chdir(self.folder_name)
         os.rename("COPYING", "LICENSE.hdf5")
         os.rename("COPYING_LBNL_HDF5", "LICENSE.hdf5_LBNL")
