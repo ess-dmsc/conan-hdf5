@@ -31,9 +31,10 @@ class Hdf5Conan(ConanFile):
     )
     generators = "virtualbuildenv"
 
-    folder_name = "hdf5-1.10.2"
+    folder_name = "hdf5-%s" % version
+    windows_source_folder = "CMake-" + folder_name
     archive_name = "%s.tar.gz" % folder_name
-    windows_archive_name = "CMake-%s.zip" % folder_name
+    windows_archive_name = "%s.zip" % windows_source_folder
 
     def configure(self):
         if self.options.cxx and self.options.parallel:
@@ -48,6 +49,11 @@ class Hdf5Conan(ConanFile):
             )
             tools.unzip(self.windows_archive_name)
             os.unlink(self.windows_archive_name)
+            # Override build settings using our own options file
+            shutil.copyfile(
+                "HDF5options.cmake",
+                os.path.join(self.windows_source_folder, "HDF5options.cmake")
+            )
         else:
             tools.download(
                 "https://www.hdfgroup.org/package/source-gzip-2/?wpdmdl=11810",
@@ -88,9 +94,10 @@ class Hdf5Conan(ConanFile):
             val = os.environ.get("LDFLAGS", "")
             os.environ["LDFLAGS"] = val + " -Wl,-rpath='$$ORIGIN/../lib'"
 
+        os.mkdir("install")
         if tools.os_info.is_windows:
-            cmake_directory = "CMake-" + self.folder_name
-            os.chdir(cmake_directory)
+            self.windows_source_folder
+            os.chdir(self.windows_source_folder)
             static_option = "No" if self.options.shared else "Yes"
             self.run("ctest -S HDF5config.cmake,BUILD_GENERATOR=VS201564,STATIC_ONLY=%s -C %s -V -O hdf5.log" % (static_option, self.settings.build_type))
         else:
@@ -109,7 +116,6 @@ class Hdf5Conan(ConanFile):
 
             env_build.make()
 
-            os.mkdir("install")
             cwd = os.getcwd()
             destdir = os.path.join(cwd, "install")
             env_build.make(args=["install", "DESTDIR="+destdir])
