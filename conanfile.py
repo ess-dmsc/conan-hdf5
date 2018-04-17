@@ -95,7 +95,7 @@ class Hdf5Conan(ConanFile):
             
             # Override build settings using our own options file
             shutil.copyfile(
-                os.path.join("..", "HDF5options.cmake"),
+                os.path.join(self.source_folder, "files", "HDF5options.cmake"),
                 "HDF5options.cmake"
             )
             
