@@ -117,6 +117,7 @@ class Hdf5Conan(ConanFile):
             if tools.os_info.is_macos and self.options.shared:
                 self._add_rpath_to_executables(os.path.join(destdir, "bin"))
 
+        cwd = os.getcwd()
         os.chdir(self.folder_name)
         os.rename("COPYING", "LICENSE.hdf5")
         os.rename("COPYING_LBNL_HDF5", "LICENSE.hdf5_LBNL")
