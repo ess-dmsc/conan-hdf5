@@ -49,12 +49,6 @@ class Hdf5Conan(ConanFile):
             )
             tools.unzip(self.windows_archive_name)
             os.unlink(self.windows_archive_name)
-            # Override build settings using our own options file
-            print(os.listdir(os.getcwd()))
-            shutil.copyfile(
-                "HDF5options.cmake",
-                os.path.join(self.windows_source_folder, "HDF5options.cmake")
-            )
         else:
             tools.download(
                 "https://www.hdfgroup.org/package/source-gzip-2/?wpdmdl=11810",
@@ -97,8 +91,14 @@ class Hdf5Conan(ConanFile):
 
         os.mkdir("install")
         if tools.os_info.is_windows:
-            self.windows_source_folder
             os.chdir(self.windows_source_folder)
+            
+            # Override build settings using our own options file
+            shutil.copyfile(
+                os.path.join("..", "HDF5options.cmake"),
+                "HDF5options.cmake"
+            )
+            
             static_option = "No" if self.options.shared else "Yes"
             try:
                 self.run("ctest -S HDF5config.cmake,BUILD_GENERATOR=VS201564,STATIC_ONLY=%s -C %s -V -O hdf5.log" % (static_option, self.settings.build_type))
