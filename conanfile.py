@@ -9,7 +9,7 @@ class ConfigurationException(Exception):
 
 class Hdf5Conan(ConanFile):
     name = "hdf5"
-    sha256 = "bfec1be8c36695a99812cf02ddc97e4b708c1754fccba5414d4adccdc073866"
+    sha256 = "bfec1be8c366965a99812cf02ddc97e4b708c1754fccba5414d4adccdc073866"
 
     version = "1.10.2"
     description = "HDF5 C and C++ libraries"
