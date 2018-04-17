@@ -89,7 +89,6 @@ class Hdf5Conan(ConanFile):
             val = os.environ.get("LDFLAGS", "")
             os.environ["LDFLAGS"] = val + " -Wl,-rpath='$$ORIGIN/../lib'"
 
-        os.mkdir("install")
         if tools.os_info.is_windows:
             cwd = os.getcwd()
             os.chdir(self.windows_source_folder)
@@ -106,7 +105,19 @@ class Hdf5Conan(ConanFile):
             except ConanException:
                 # Allowed to "fail" on having no tests to run, because we purposely aren't building the tests
                 pass
+            
+            install_package_name = "HDF5-%s-win64" % self.version
+            install_package = "HDF5-%s-win64.zip" % self.version
+            os.chdir("build")
+            tools.unzip(install_package)
+            os.unlink(install_package)
+            shutil.copytree(install_package_name, os.path.join("..", "..", "install"))
+            os.chdir(cwd)
+            os.chdir("install")
+
         else:
+            os.mkdir("install")
+            
             env_build = AutoToolsBuildEnvironment(self)
             env_build.configure(
                 configure_dir=self.folder_name,
@@ -129,13 +140,14 @@ class Hdf5Conan(ConanFile):
             if tools.os_info.is_macos and self.options.shared:
                 self._add_rpath_to_executables(os.path.join(destdir, "bin"))
 
-        os.chdir(self.folder_name)
-        os.rename("COPYING", "LICENSE.hdf5")
-        os.rename("COPYING_LBNL_HDF5", "LICENSE.hdf5_LBNL")
-        shutil.copyfile(
+            os.chdir(self.folder_name)
+            os.rename("COPYING_LBNL_HDF5", "LICENSE.hdf5_LBNL")
+            shutil.copyfile(
             os.path.join(self.source_folder, "files", "CHANGES"),
             "CHANGES.hdf5"
         )
+        
+        os.rename("COPYING", "LICENSE.hdf5")
         os.chdir(cwd)
 
     def _add_rpath_to_executables(self, path):
@@ -159,8 +171,9 @@ class Hdf5Conan(ConanFile):
         self.copy("*", dst="bin", src="install/bin")
         self.copy("*", dst="include", src="install/include")
         self.copy("*", dst="lib", src="install/lib")
-        self.copy("LICENSE.*", src=self.folder_name)
-        self.copy("CHANGES.*", src=self.folder_name)
+        if not tools.os_info.is_windows:
+            self.copy("LICENSE.*", src=self.folder_name)
+            self.copy("CHANGES.*", src=self.folder_name)
 
     def package_info(self):
         self.cpp_info.libs = ["hdf5", "hdf5_hl"]
