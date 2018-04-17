@@ -33,6 +33,7 @@ class Hdf5Conan(ConanFile):
 
     folder_name = "hdf5-1.10.2"
     archive_name = "%s.tar.gz" % folder_name
+    windows_archive_name = "CMake-%s.zip" % folder_name
 
     def configure(self):
         if self.options.cxx and self.options.parallel:
@@ -43,16 +44,18 @@ class Hdf5Conan(ConanFile):
         if tools.os_info.is_windows:
             tools.download(
                 "https://www.hdfgroup.org/package/source-cmake-windows-2/?wpdmdl=11820",
-                self.archive_name
+                self.windows_archive_name
             )
+            tools.unzip(self.windows_archive_name)
+            os.unlink(self.windows_archive_name)
         else:
             tools.download(
                 "https://www.hdfgroup.org/package/source-gzip-2/?wpdmdl=11810",
                 self.archive_name
             )
             tools.check_sha256(self.archive_name, self.sha256)
-        tools.unzip(self.archive_name)
-        os.unlink(self.archive_name)
+            tools.unzip(self.archive_name)
+            os.unlink(self.archive_name)
 
     def build(self):
         configure_args = [
