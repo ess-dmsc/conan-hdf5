@@ -91,7 +91,7 @@ class Hdf5Conan(ConanFile):
 
         if tools.os_info.is_windows:
             cwd = os.getcwd()
-            os.chdir(self.windows_source_folder)
+            os.chdir(os.path.join(self.source_folder, self.windows_source_folder))
             
             # Override build settings using our own options file
             shutil.copyfile(
@@ -112,8 +112,7 @@ class Hdf5Conan(ConanFile):
             tools.unzip(install_package)
             os.unlink(install_package)
             shutil.copytree(install_package_name, os.path.join("..", "..", "install"))
-            os.chdir(cwd)
-            os.chdir("install")
+            os.chdir(os.path.join("..", "..", "install"))
 
         else:
             os.mkdir("install")
@@ -147,7 +146,7 @@ class Hdf5Conan(ConanFile):
             "CHANGES.hdf5"
         )
         
-        os.rename("COPYING", "LICENSE.hdf5")
+        os.rename("COPYING", "LICENSE.hdf5") 
         os.chdir(cwd)
 
     def _add_rpath_to_executables(self, path):

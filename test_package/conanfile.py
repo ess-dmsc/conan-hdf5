@@ -1,4 +1,4 @@
-from conans import ConanFile, CMake
+from conans import ConanFile, CMake, RunEnvironment, tools
 import os
 
 
@@ -19,6 +19,8 @@ class Hdf5TestConan(ConanFile):
         self.copy("")
 
     def test(self):
+        run_env = RunEnvironment(self)
         hdf5_file = os.path.join(self.source_folder, "sample.h5")
         os.chdir("bin")
-        self.run(".%sexample %s" % (os.sep, hdf5_file))
+        with tools.environment_append(run_env.vars):
+            self.run(".%sexample %s" % (os.sep, hdf5_file))
