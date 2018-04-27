@@ -3,6 +3,7 @@ import shutil
 from conans import ConanFile, AutoToolsBuildEnvironment, tools
 from conans.errors import ConanException
 
+
 class ConfigurationException(Exception):
     pass
 
@@ -11,7 +12,7 @@ class Hdf5Conan(ConanFile):
     name = "hdf5"
     sha256 = "bfec1be8c366965a99812cf02ddc97e4b708c1754fccba5414d4adccdc073866"
 
-    version = "1.10.2"
+    version = "1.10.2-dm1"
     description = "HDF5 C and C++ libraries"
     license = "https://support.hdfgroup.org/ftp/HDF5/releases/COPYING"
     url = "https://github.com/ess-dmsc/conan-hdf5"
@@ -178,3 +179,5 @@ class Hdf5Conan(ConanFile):
         self.cpp_info.libs = ["hdf5", "hdf5_hl"]
         if self.options.cxx:
             self.cpp_info.libs.append("hdf5_cpp")
+        if tools.os_info.is_windows:
+            self.cpp_info.defines = ["H5_BUILT_AS_DYNAMIC_LIB"]
