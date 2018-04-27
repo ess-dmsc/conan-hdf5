@@ -12,6 +12,7 @@ class Hdf5Conan(ConanFile):
     name = "hdf5"
     sha256 = "bfec1be8c366965a99812cf02ddc97e4b708c1754fccba5414d4adccdc073866"
 
+    version_number = "1.10.2"
     version = "1.10.2-dm1"
     description = "HDF5 C and C++ libraries"
     license = "https://support.hdfgroup.org/ftp/HDF5/releases/COPYING"
@@ -32,7 +33,7 @@ class Hdf5Conan(ConanFile):
     )
     generators = "virtualbuildenv"
 
-    folder_name = "hdf5-%s" % version
+    folder_name = "hdf5-%s" % version_number
     windows_source_folder = "CMake-" + folder_name
     archive_name = "%s.tar.gz" % folder_name
     windows_archive_name = "%s.zip" % windows_source_folder
@@ -107,8 +108,8 @@ class Hdf5Conan(ConanFile):
                 # Allowed to "fail" on having no tests to run, because we purposely aren't building the tests
                 pass
             
-            install_package_name = "HDF5-%s-win64" % self.version
-            install_package = "HDF5-%s-win64.zip" % self.version
+            install_package_name = "HDF5-%s-win64" % self.version_number
+            install_package = "HDF5-%s-win64.zip" % self.version_number
             os.chdir("build")
             tools.unzip(install_package)
             os.unlink(install_package)
