@@ -149,7 +149,7 @@ class Hdf5Conan(ConanFile):
             tools.replace_in_file(
                 hdf5_compiler_wrapper,
                 'prefix=""',
-                'prefix="${H5CC_PREFIX}"'
+                'prefix="$(cd "$( dirname "$0" )" && pwd)/.."'
             )
 
             if tools.os_info.is_macos and self.options.shared:
