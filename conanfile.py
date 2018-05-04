@@ -36,6 +36,10 @@ class Hdf5Conan(ConanFile):
     archive_name = "%s.tar.gz" % folder_name
     windows_archive_name = "%s.zip" % windows_source_folder
 
+    def requirements(self):
+        if  self.options.parallel:
+            self.requires('mpich/3.2.1@ess-dmsc/stable')
+
     def configure(self):
         if self.options.cxx and self.options.parallel:
             msg = "The cxx and parallel options are not compatible"
