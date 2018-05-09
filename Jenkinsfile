@@ -86,6 +86,7 @@ def get_pipeline(image_key) {
             conan create . ${conan_user}/${conan_pkg_channel} \
               --settings hdf5:build_type=Debug \
               --options hdf5:shared=False \
+              --options hdf5:cxx=False \
               --build=outdated
           \""""
 
@@ -94,6 +95,7 @@ def get_pipeline(image_key) {
             conan create . ${conan_user}/${conan_pkg_channel} \
               --settings hdf5:build_type=Debug \
               --options hdf5:shared=True \
+              --options hdf5:cxx=False \
               --build=outdated
           \""""
 
@@ -102,6 +104,7 @@ def get_pipeline(image_key) {
             conan create . ${conan_user}/${conan_pkg_channel} \
               --settings hdf5:build_type=Release \
               --options hdf5:shared=False \
+              --options hdf5:cxx=False \
               --build=outdated
           \""""
 
@@ -110,6 +113,7 @@ def get_pipeline(image_key) {
             conan create . ${conan_user}/${conan_pkg_channel} \
               --settings hdf5:build_type=Release \
               --options hdf5:shared=True \
+              --options hdf5:cxx=False \
               --build=outdated
           \""""
 
