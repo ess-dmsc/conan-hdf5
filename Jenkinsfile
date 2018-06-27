@@ -7,15 +7,15 @@ conan_pkg_channel = "stable"
 images = [
   'centos7': [
     'name': 'essdmscdm/centos7-build-node:3.0.0',
-    'sh': '/usr/bin/scl enable devtoolset-6 -- /bin/bash'
+    'sh': '/usr/bin/scl enable devtoolset-6 -- /bin/bash -e'
   ],
   'debian9': [
     'name': 'essdmscdm/debian9-build-node:2.0.0',
-    'sh': 'sh'
+    'sh': 'bash -e'
   ],
   'ubuntu1804': [
     'name': 'essdmscdm/ubuntu18.04-build-node:1.1.0',
-    'sh': 'sh'
+    'sh': 'bash -e'
   ]
 ]
 
@@ -58,7 +58,7 @@ def get_pipeline(image_key) {
               set +x
               conan remote add \
                 --insert 0 \
-                ${conan_remote} ${local_conan_server} && \
+                ${conan_remote} ${local_conan_server}
               conan user \
                 --password '${CONAN_PASSWORD}' \
                 --remote ${conan_remote} \
