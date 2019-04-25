@@ -32,6 +32,9 @@ class Hdf5Conan(ConanFile):
     )
     generators = "virtualbuildenv"
     source_subfolder = "source_subfolder"
+    
+    windows_source_folder = "CMake-hdf5-%s" % version_number
+    windows_archive_name = "%s.zip" % windows_source_folder
 
 
     def configure(self):
@@ -40,10 +43,20 @@ class Hdf5Conan(ConanFile):
             raise ConfigurationException(msg)
 
     def source(self):
-        minor_version = ".".join(self.version.split(".")[:2])
-        tools.get("https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-{0}/hdf5-{1}/src/hdf5-{1}.tar.gz"
-                  .format(minor_version, self.version))
-        os.rename("hdf5-{0}".format(self.version), self.source_subfolder)
+        if tools.os_info.is_windows:
+            tools.download(
+                "https://www.hdfgroup.org/package/cmake-hdf5-1-10-5-zip-2/?wpdmdl=13528",
+                self.windows_archive_name
+            )
+            tools.unzip(self.windows_archive_name)
+            os.unlink(self.windows_archive_name)
+            os.rename(self.windows_source_folder, self.source_subfolder)
+        else:
+            minor_version = ".".join(self.version.split(".")[:2])
+            tools.get("https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-{0}/hdf5-{1}/src/hdf5-{1}.tar.gz"
+                    .format(minor_version, self.version))
+            os.rename("hdf5-{0}".format(self.version), self.source_subfolder)
+        
 
     def build(self):
         configure_args = [
