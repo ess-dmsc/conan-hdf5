@@ -10,10 +10,9 @@ class ConfigurationException(Exception):
 
 class Hdf5Conan(ConanFile):
     name = "hdf5"
-    sha256 = "bfec1be8c366965a99812cf02ddc97e4b708c1754fccba5414d4adccdc073866"
 
-    version_number = "1.10.2"
-    version = "1.10.2-dm2"
+    version = "1.10.5"
+    version_number = "1.10.5"
     description = "HDF5 C and C++ libraries"
     license = "https://support.hdfgroup.org/ftp/HDF5/releases/COPYING"
     url = "https://github.com/ess-dmsc/conan-hdf5"
@@ -32,11 +31,11 @@ class Hdf5Conan(ConanFile):
         "zlib:shared=False"
     )
     generators = "virtualbuildenv"
-
-    folder_name = "hdf5-%s" % version_number
-    windows_source_folder = "CMake-" + folder_name
-    archive_name = "%s.tar.gz" % folder_name
+    source_subfolder = "source_subfolder"
+    
+    windows_source_folder = "CMake-hdf5-%s" % version_number
     windows_archive_name = "%s.zip" % windows_source_folder
+
 
     def configure(self):
         if self.options.cxx and self.options.parallel:
@@ -46,19 +45,18 @@ class Hdf5Conan(ConanFile):
     def source(self):
         if tools.os_info.is_windows:
             tools.download(
-                "https://www.hdfgroup.org/package/source-cmake-windows-2/?wpdmdl=11820",
+                "https://www.hdfgroup.org/package/cmake-hdf5-1-10-5-zip-2/?wpdmdl=13528",
                 self.windows_archive_name
             )
             tools.unzip(self.windows_archive_name)
             os.unlink(self.windows_archive_name)
+            os.rename(self.windows_source_folder, self.source_subfolder)
         else:
-            tools.download(
-                "https://www.hdfgroup.org/package/source-gzip-2/?wpdmdl=11810",
-                self.archive_name
-            )
-            tools.check_sha256(self.archive_name, self.sha256)
-            tools.unzip(self.archive_name)
-            os.unlink(self.archive_name)
+            minor_version = ".".join(self.version.split(".")[:2])
+            tools.get("https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-{0}/hdf5-{1}/src/hdf5-{1}.tar.gz"
+                    .format(minor_version, self.version))
+            os.rename("hdf5-{0}".format(self.version), self.source_subfolder)
+        
 
     def build(self):
         configure_args = [
@@ -93,7 +91,7 @@ class Hdf5Conan(ConanFile):
 
         if tools.os_info.is_windows:
             cwd = os.getcwd()
-            os.chdir(os.path.join(self.source_folder, self.windows_source_folder))
+            os.chdir(os.path.join(self.source_folder, self.source_subfolder))
 
             # Override build settings using our own options file
             shutil.copyfile(
@@ -121,7 +119,7 @@ class Hdf5Conan(ConanFile):
 
             env_build = AutoToolsBuildEnvironment(self)
             env_build.configure(
-                configure_dir=self.folder_name,
+                configure_dir=self.source_subfolder,
                 args=configure_args
             )
 
@@ -155,7 +153,7 @@ class Hdf5Conan(ConanFile):
             if tools.os_info.is_macos and self.options.shared:
                 self._add_rpath_to_executables(os.path.join(destdir, "bin"))
 
-            os.chdir(self.folder_name)
+            os.chdir(self.source_subfolder)
             os.rename("COPYING_LBNL_HDF5", "LICENSE.hdf5_LBNL")
             shutil.copyfile(
             os.path.join(self.source_folder, "files", "CHANGES"),
@@ -187,8 +185,8 @@ class Hdf5Conan(ConanFile):
         self.copy("*", dst="include", src="install/include")
         self.copy("*", dst="lib", src="install/lib")
         if not tools.os_info.is_windows:
-            self.copy("LICENSE.*", src=self.folder_name)
-            self.copy("CHANGES.*", src=self.folder_name)
+            self.copy("LICENSE.*", src=self.source_subfolder)
+            self.copy("CHANGES.*", src=self.source_subfolder)
 
     def package_info(self):
         self.cpp_info.libs = ["hdf5", "hdf5_hl"]
