@@ -52,10 +52,10 @@ class Hdf5Conan(ConanFile):
             os.unlink(self.windows_archive_name)
             os.rename(self.windows_source_folder, self.source_subfolder)
         else:
-            minor_version = ".".join(self.version.split(".")[:2])
+            minor_version = ".".join(self.version_number.split(".")[:2])
             tools.get("https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-{0}/hdf5-{1}/src/hdf5-{1}.tar.gz"
-                    .format(minor_version, self.version))
-            os.rename("hdf5-{0}".format(self.version), self.source_subfolder)
+                    .format(minor_version, self.version_number))
+            os.rename("hdf5-{0}".format(self.version_number), self.source_subfolder)
         
 
     def build(self):
