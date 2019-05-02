@@ -11,7 +11,7 @@ class ConfigurationException(Exception):
 class Hdf5Conan(ConanFile):
     name = "hdf5"
 
-    version = "1.10.5"
+    version = "1.10.5-dm1"
     version_number = "1.10.5"
     description = "HDF5 C and C++ libraries"
     license = "https://support.hdfgroup.org/ftp/HDF5/releases/COPYING"
@@ -101,7 +101,15 @@ class Hdf5Conan(ConanFile):
 
             static_option = "No" if self.options.shared else "Yes"
             try:
-                self.run("ctest -S HDF5config.cmake,BUILD_GENERATOR=VS201564,STATIC_ONLY=%s -C %s -V -O hdf5.log" % (static_option, self.settings.build_type))
+                if self.settings.compiler.version == "14":
+                    compiler_year = "2015"
+                elif self.settings.compiler.version == "15":
+                    compiler_year = "2017"
+                elif self.settings.compiler.version == "16":
+                    compiler_year = "2019"
+                else:
+                    raise Exception("Only MSVC versions 14, 15 and 16 are currently supported by the recipe")
+                self.run("ctest -S HDF5config.cmake,BUILD_GENERATOR=VS{}64,STATIC_ONLY={} -C {} -V -O hdf5.log".format(compiler_year, static_option, self.settings.build_type))
             except ConanException:
                 # Allowed to "fail" on having no tests to run, because we purposely aren't building the tests
                 pass
