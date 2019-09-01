@@ -197,8 +197,27 @@ class Hdf5Conan(ConanFile):
             self.copy("CHANGES.*", src=self.source_subfolder)
 
     def package_info(self):
-        self.cpp_info.libs = ["hdf5", "hdf5_hl"]
+        libs = ["hdf5", "hdf5_hl"]
+
         if self.options.cxx:
-            self.cpp_info.libs.append("hdf5_cpp")
-        if tools.os_info.is_windows:
+            libs.extend(["hdf5_cpp", "hdf5_hl_cpp"])
+
+        # Static library prefix
+        if not self.options.shared:
+            libs = ["lib"+lib for lib in libs]
+
+        # Debug postfix
+        if self.settings.build_type == "Debug":
+            libs = [lib+"_D" for lib in libs]
+
+        # Add szip
+        if not self.options.shared:
+            libs.append("szip_D" if self.settings.build_type == "Debug" else "szip")
+
+        self.cpp_info.libs = libs
+
+        self.output.info("LIBRARIES: %s" % self.cpp_info.libs)
+        self.output.info("Package folder: %s" % self.package_folder)
+
+        if tools.os_info.is_windows and self.options.shared:
             self.cpp_info.defines = ["H5_BUILT_AS_DYNAMIC_LIB"]
