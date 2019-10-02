@@ -11,7 +11,7 @@ class ConfigurationException(Exception):
 class Hdf5Conan(ConanFile):
     name = "hdf5"
 
-    version = "1.10.5-dm1"
+    version = "1.10.5-dm2"
     version_number = "1.10.5"
     description = "HDF5 C and C++ libraries"
     license = "https://support.hdfgroup.org/ftp/HDF5/releases/COPYING"
@@ -25,14 +25,14 @@ class Hdf5Conan(ConanFile):
         "parallel": [True, False]
     }
     default_options = (
-        "cxx=True",
+        "cxx=False",
         "shared=False",
         "parallel=False",
         "zlib:shared=False"
     )
     generators = "virtualbuildenv"
     source_subfolder = "source_subfolder"
-    
+
     windows_source_folder = "CMake-hdf5-%s" % version_number
     windows_archive_name = "%s.zip" % windows_source_folder
 
@@ -56,7 +56,7 @@ class Hdf5Conan(ConanFile):
             tools.get("https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-{0}/hdf5-{1}/src/hdf5-{1}.tar.gz"
                     .format(minor_version, self.version_number))
             os.rename("hdf5-{0}".format(self.version_number), self.source_subfolder)
-        
+
 
     def build(self):
         configure_args = [

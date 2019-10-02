@@ -6,7 +6,7 @@ project = "conan-hdf5"
 
 conan_remote = "ess-dmsc-local"
 conan_user = "ess-dmsc"
-conan_pkg_channel = "stable"
+conan_pkg_channel = "testing"
 
 containerBuildNodes = [
   'centos': ContainerBuildNode.getDefaultContainerBuildNode('centos7'),
@@ -38,7 +38,7 @@ builders = packageBuilder.createPackageBuilders { container ->
       'hdf5:cxx': 'False'
     ]
   ])
-  
+
   packageBuilder.addConfiguration(container, [
     'settings': [
       'hdf5:build_type': 'Release'
@@ -48,7 +48,7 @@ builders = packageBuilder.createPackageBuilders { container ->
       'hdf5:cxx': 'False'
     ]
   ])
-  
+
   packageBuilder.addConfiguration(container, [
     'settings': [
       'hdf5:build_type': 'Release'
@@ -58,7 +58,7 @@ builders = packageBuilder.createPackageBuilders { container ->
       'hdf5:cxx': 'False'
     ]
   ])
-  
+
   if (container.key == 'centos') {
     packageBuilder.addConfiguration(container, [
       'settings': [
