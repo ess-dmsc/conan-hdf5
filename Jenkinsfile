@@ -4,7 +4,6 @@ import ecdcpipeline.ConanPackageBuilder
 
 project = "conan-hdf5"
 
-conan_remote = "ess-dmsc-local"
 conan_user = "ess-dmsc"
 conan_pkg_channel = "stable"
 
@@ -99,21 +98,6 @@ def get_macos_pipeline() {
           checkout scm
         }  // stage
 
-        stage("macOS: Conan setup") {
-          withCredentials([
-            string(
-              credentialsId: 'local-conan-server-password',
-              variable: 'CONAN_PASSWORD'
-            )
-          ]) {
-            sh "conan user \
-              --password '${CONAN_PASSWORD}' \
-              --remote ${conan_remote} \
-              ${conan_user} \
-              > /dev/null"
-          }  // withCredentials
-        }  // stage
-
         stage("macOS: Package") {
           sh "conan create . ${conan_user}/${conan_pkg_channel} \
             --settings hdf5:build_type=Debug \
@@ -149,20 +133,6 @@ def get_win10_pipeline() {
       dir("${project}") {
         stage("win10: Checkout") {
           checkout scm
-        }  // stage
-
-        stage("win10: Conan setup") {
-          withCredentials([
-            string(
-              credentialsId: 'local-conan-server-password',
-              variable: 'CONAN_PASSWORD'
-            )
-          ]) {
-            bat """C:\\Users\\dmgroup\\AppData\\Local\\Programs\\Python\\Python36\\Scripts\\conan.exe user \
-              --password ${CONAN_PASSWORD} \
-              --remote ${conan_remote} \
-              ${conan_user}"""
-          }  // withCredentials
         }  // stage
 
         stage("win10: Package") {
