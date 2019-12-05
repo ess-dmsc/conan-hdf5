@@ -135,13 +135,6 @@ def get_macos_pipeline() {
             --options hdf5:shared=True \
             --build=outdated"
         }  // stage
-
-        stage("macOS: Upload") {
-          sh "upload_conan_package.sh conanfile.py \
-            ${conan_remote} \
-            ${conan_user} \
-            ${conan_pkg_channel}"
-        }  // stage
       }  // dir
     }  // node
   }  // return
@@ -179,15 +172,8 @@ def get_win10_pipeline() {
             --options hdf5:shared=True \
             --build=outdated"""
         }  // stage
-
-        stage("win10: Upload") {
-          //sh "upload_conan_package.sh conanfile.py \
-          //  ${conan_remote} \
-           // ${conan_user} \
-           // ${conan_pkg_channel}"
-        }  // stage
       }  // dir
-      }
+      }  // ws
     }  // node
   }  // return
 } // def
