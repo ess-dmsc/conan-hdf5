@@ -75,6 +75,14 @@ builders = packageBuilder.createPackageBuilders { container ->
     ])
   }
 
+  packageBuilder.addConfiguration(container, [
+    'options': [
+      'zlib:fPIC': 'True',
+      'zlib:minizip': 'False',
+      'zlib:shared': 'False'
+    ]
+  ])
+
   packageBuilder.addConfiguration(container)
 }
 
