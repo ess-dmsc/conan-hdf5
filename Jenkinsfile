@@ -11,8 +11,7 @@ containerBuildNodes = [
   'centos': ContainerBuildNode.getDefaultContainerBuildNode('centos7'),
   'centos-gcc8': ContainerBuildNode.getDefaultContainerBuildNode('centos7-gcc8'),
   'debian': ContainerBuildNode.getDefaultContainerBuildNode('debian9'),
-  'ubuntu': ContainerBuildNode.getDefaultContainerBuildNode('ubuntu1804'),
-  'alpine': ContainerBuildNode.getDefaultContainerBuildNode('alpine')
+  'ubuntu': ContainerBuildNode.getDefaultContainerBuildNode('ubuntu1804')
 ]
 
 packageBuilder = new ConanPackageBuilder(this, containerBuildNodes, conan_pkg_channel)
