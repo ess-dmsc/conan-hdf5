@@ -11,14 +11,14 @@ class ConfigurationException(Exception):
 class Hdf5Conan(ConanFile):
     name = "hdf5"
 
-    version = "1.10.5-dm2"
+    version = "1.10.5-dm3"
     version_number = "1.10.5"
     description = "HDF5 C and C++ libraries"
     license = "https://support.hdfgroup.org/ftp/HDF5/releases/COPYING"
     url = "https://github.com/ess-dmsc/conan-hdf5"
     exports = ["files/CHANGES", "files/HDF5options.cmake"]
     settings = "os", "compiler", "build_type", "arch"
-    requires = "zlib/1.2.11@conan/stable"
+    requires = "zlib/1.2.11"
     options = {
         "cxx": [True, False],
         "shared": [True, False],

@@ -5,13 +5,12 @@ import ecdcpipeline.ConanPackageBuilder
 project = "conan-hdf5"
 
 conan_user = "ess-dmsc"
-conan_pkg_channel = "stable"
+conan_pkg_channel = "testing"
 
 containerBuildNodes = [
-  'centos': ContainerBuildNode.getDefaultContainerBuildNode('centos7'),
-  'centos-gcc8': ContainerBuildNode.getDefaultContainerBuildNode('centos7-gcc8'),
-  'debian': ContainerBuildNode.getDefaultContainerBuildNode('debian9'),
-  'ubuntu': ContainerBuildNode.getDefaultContainerBuildNode('ubuntu1804')
+  'centos': ContainerBuildNode.getDefaultContainerBuildNode('centos7-gcc8'),
+  'debian': ContainerBuildNode.getDefaultContainerBuildNode('debian10'),
+  'ubuntu': ContainerBuildNode.getDefaultContainerBuildNode('ubuntu1804-gcc8')
 ]
 
 packageBuilder = new ConanPackageBuilder(this, containerBuildNodes, conan_pkg_channel)
