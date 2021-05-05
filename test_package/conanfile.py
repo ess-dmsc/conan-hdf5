@@ -15,6 +15,7 @@ class Hdf5TestConan(ConanFile):
         cmake.build()
 
     def imports(self):
+        self.copy("*.dll", dst="bin", src="bin")
         self.copy("*.dylib*", dst="bin", src="lib")
         self.copy("")
 
