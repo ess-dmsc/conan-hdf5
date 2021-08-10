@@ -107,7 +107,7 @@ class Hdf5Conan(ConanFile):
                     compiler_year = "2019"
                 else:
                     raise Exception("Only MSVC versions 14, 15 and 16 are currently supported by the recipe")
-                self.run(f"ctest -S HDF5config.cmake,BUILD_GENERATOR=VS{compilier_year}64,STATIC_ONLY={static_option} -C {self.settings.build_type} -V -O hdf5.log")
+                self.run(f"ctest -S HDF5config.cmake,BUILD_GENERATOR=VS{compiler_year}64,STATIC_ONLY={static_option} -C {self.settings.build_type} -V -O hdf5.log")
             except ConanException:
                 # Allowed to "fail" on having no tests to run, because we purposely aren't building the tests
                 pass
