@@ -5,7 +5,7 @@ import ecdcpipeline.PipelineBuilder
 
 project = "conan-hdf5"
 conan_user = "ess-dmsc"
-conan_pkg_channel = "debug"
+conan_pkg_channel = "stable"
 
 def num_artifacts_to_keep
 if (env.BRANCH_NAME == 'master') {
