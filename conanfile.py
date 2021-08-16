@@ -10,9 +10,8 @@ class ConfigurationException(Exception):
 
 class Hdf5Conan(ConanFile):
     name = "hdf5"
-
-    version = "1.10.5-dm3"
-    version_number = "1.10.5"
+    version = "1.12.1"
+    lib_version = f"{version}"  # The package version can change separately
     description = "HDF5 C and C++ libraries"
     license = "https://support.hdfgroup.org/ftp/HDF5/releases/COPYING"
     url = "https://github.com/ess-dmsc/conan-hdf5"
@@ -33,8 +32,8 @@ class Hdf5Conan(ConanFile):
     generators = "virtualbuildenv"
     source_subfolder = "source_subfolder"
 
-    windows_source_folder = "CMake-hdf5-%s" % version_number
-    windows_archive_name = "%s.zip" % windows_source_folder
+    windows_source_folder = f"CMake-hdf5-{lib_version}"
+    windows_archive_name = f"{windows_source_folder}.zip"
 
 
     def configure(self):
@@ -43,19 +42,18 @@ class Hdf5Conan(ConanFile):
             raise ConfigurationException(msg)
 
     def source(self):
+        major_minor_version = ".".join(self.lib_version.split(".")[:2])
         if tools.os_info.is_windows:
             tools.download(
-                "https://www.hdfgroup.org/package/cmake-hdf5-1-10-5-zip-2/?wpdmdl=13528",
+                f"https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-{major_minor_version}/hdf5-{self.lib_version}/src/CMake-hdf5-{self.lib_version}.zip",
                 self.windows_archive_name
             )
             tools.unzip(self.windows_archive_name)
             os.unlink(self.windows_archive_name)
             os.rename(self.windows_source_folder, self.source_subfolder)
         else:
-            minor_version = ".".join(self.version_number.split(".")[:2])
-            tools.get("https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-{0}/hdf5-{1}/src/hdf5-{1}.tar.gz"
-                    .format(minor_version, self.version_number))
-            os.rename("hdf5-{0}".format(self.version_number), self.source_subfolder)
+            tools.get(f"https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-{major_minor_version}/hdf5-{self.lib_version}/src/hdf5-{self.lib_version}.tar.gz")
+            os.rename(f"hdf5-{self.lib_version}", self.source_subfolder)
 
 
     def build(self):
@@ -109,13 +107,13 @@ class Hdf5Conan(ConanFile):
                     compiler_year = "2019"
                 else:
                     raise Exception("Only MSVC versions 14, 15 and 16 are currently supported by the recipe")
-                self.run("ctest -S HDF5config.cmake,BUILD_GENERATOR=VS{}64,STATIC_ONLY={} -C {} -V -O hdf5.log".format(compiler_year, static_option, self.settings.build_type))
+                self.run(f"ctest -S HDF5config.cmake,BUILD_GENERATOR=VS{compiler_year}64,STATIC_ONLY={static_option} -C {self.settings.build_type} -V -O hdf5.log")
             except ConanException:
                 # Allowed to "fail" on having no tests to run, because we purposely aren't building the tests
                 pass
 
-            install_package_name = "HDF5-%s-win64" % self.version_number
-            install_package = "HDF5-%s-win64.zip" % self.version_number
+            install_package_name = f"HDF5-{self.lib_version}-win64"
+            install_package = f"HDF5-{self.lib_version}-win64.zip"
             os.chdir("build")
             tools.unzip(install_package)
             os.unlink(install_package)
@@ -180,10 +178,8 @@ class Hdf5Conan(ConanFile):
         ]
         cwd = os.getcwd()
         os.chdir(path)
-        for e in executables:
-            cmd = "install_name_tool -add_rpath {0} {1}".format(
-                "@executable_path/../lib", e
-            )
+        for executable in executables:
+            cmd = "install_name_tool -add_rpath @executable_path/../lib {executable}"
             os.system(cmd)
 
         os.chdir(cwd)
