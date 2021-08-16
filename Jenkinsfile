@@ -7,6 +7,13 @@ project = "conan-hdf5"
 conan_user = "ess-dmsc"
 conan_pkg_channel = "debug"
 
+def num_artifacts_to_keep
+if (env.BRANCH_NAME == 'master') {
+  num_artifacts_to_keep = '3'
+} else {
+  num_artifacts_to_keep = '1'
+}
+
 // Set number of old builds to keep.
 properties([[
   $class: 'BuildDiscarderProperty',
