@@ -4,6 +4,16 @@
 
 Conan package for HDF5.
 
+## Using the package
+
+See the DMSC [conan-configuration repository](https://github.com/ess-dmsc/conan-configuration) for how to configure your remote.
+
+In `conanfile.txt`:
+
+```
+hdf5/1.12.1@ess-dmsc/stable
+```
+
 ## Executables and shared libraries
 
 When the package is compiled with the `shared=True` option, the _rpath_ for
