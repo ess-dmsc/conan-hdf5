@@ -28,7 +28,7 @@ properties([[
 
 containerBuildNodes = [
   'centos': ContainerBuildNode.getDefaultContainerBuildNode('centos7-gcc8'),
-  'debian': ContainerBuildNode.getDefaultContainerBuildNode('debian10'),
+  'debian10': ContainerBuildNode.getDefaultContainerBuildNode('debian10'),
   'ubuntu2004': ContainerBuildNode.getDefaultContainerBuildNode('ubuntu2004')
 ]
 archivingBuildNodes = [

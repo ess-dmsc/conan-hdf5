@@ -1,7 +1,8 @@
 # conan-hdf5
 
-Conan package for HDF5.
+[![Build Status](https://jenkins.esss.dk/dm/job/ess-dmsc/job/conan-hdf5/job/master/badge/icon)](https://jenkins.esss.dk/dm/job/ess-dmsc/job/conan-hdf5/job/master/)
 
+Conan package for HDF5.
 
 ## Executables and shared libraries
 
