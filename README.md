@@ -1,7 +1,18 @@
 # conan-hdf5
 
+[![Build Status](https://jenkins.esss.dk/dm/job/ess-dmsc/job/conan-hdf5/job/master/badge/icon)](https://jenkins.esss.dk/dm/job/ess-dmsc/job/conan-hdf5/job/master/)
+
 Conan package for HDF5.
 
+## Using the package
+
+See the DMSC [conan-configuration repository](https://github.com/ess-dmsc/conan-configuration) for how to configure your remote.
+
+In `conanfile.txt`:
+
+```
+hdf5/1.12.1@ess-dmsc/stable
+```
 
 ## Executables and shared libraries
 
