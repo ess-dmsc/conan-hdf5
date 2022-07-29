@@ -64,7 +64,7 @@ builders = packageBuilder.createPackageBuilders { container ->
       'hdf5:build_type': 'Release'
     ],
     'options': [
-      'hdf5:shared': 'True',
+      'hdf5:shared': 'False',
       'hdf5:cxx': 'False'
     ]
   ])
