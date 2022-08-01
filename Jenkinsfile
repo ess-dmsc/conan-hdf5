@@ -120,11 +120,6 @@ archivingBuilders = pipelineBuilder.createBuilders { container ->
     container.sh """
       cd ${pipelineBuilder.project}/archiving
       ./generate-conanfile.sh ${conan_user} ${conan_pkg_channel}
-
-      conan remote add \
-        --insert 0 \
-        ess-dmsc-local ${local_conan_server}
-
       mkdir hdf5
       cd hdf5
       conan install ..
